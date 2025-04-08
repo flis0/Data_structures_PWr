@@ -1,0 +1,23 @@
+List size 1000; Array size 1000
+LinkedList push_front time: 146 ns
+DynamicArray push_front time: 3530 ns
+List size 2000; Array size 2000
+LinkedList push_back time: 16155 ns
+DynamicArray push_back time: 103 ns
+List size 1000; Array size 1000
+LinkedList pop_front time: 154 ns
+DynamicArray pop_front time: 13583 ns
+List size 0; Array size 0
+LinkedList pop_back time: 4390 ns
+DynamicArray pop_back time: 71 ns
+List size 1000; Array size 1000
+LinkedList insert time: 4757 ns
+DynamicArray insert time: 70 ns
+List size 1000; Array size 1000
+LinkedList find time: 4786 ns
+DynamicArray find time: 3092 ns
+List size 66; Array size 65
+LinkedList erase time: 645 ns
+DynamicArray erase time: 4244 ns
+LinkedList: 351 659 695 723 727 730 759 778 791 805 812 827 835 838 843 851 855 859 866 870 872 874 878 888 890 895 897 898 901 903 904 907 913 914 917 933 935 938 941 942 943 944 949 950 953 957 962 968 969 974 975 977 979 983 984 985 986 987 990 992 993 994 995 996 997 998
+DynamicArray: 591 727 737 745 746 755 756 764 788 802 804 810 813 814 822 831 862 881 889 890 891 900 901 902 908 909 911 916 921 923 925 926 930 932 933 934 935 937 938 940 943 944 949 952 953 955 956 958 961 962 965 969 971 977 978 981 984 985 986 987 989 992 995 997 998
