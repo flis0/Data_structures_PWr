@@ -9,14 +9,10 @@
 #define ARR_INIT_CAP 10
 
 int main() {
-    // LinkedList<int> list;
-    // DynamicArray<int> arr;
-
     long list_time_sum, arr_time_sum;
     int temp;
     std::chrono::high_resolution_clock::time_point start, end;
 
-    // initialalize random number generator
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dis_1k(0, 999);
@@ -27,9 +23,6 @@ int main() {
     file << "N;Operation;LinkedList [ns];DynamicArray [ns]" << std::endl;
 
     for (int size = 10000; size <= 100000; size += 10000) {
-        // for (int i = size - list.get_size(); i > 0; i--) { list.push_back(dis_1m(gen)); }
-        // for (int i = size - arr.get_size(); i > 0; i--) { arr.push_back(dis_1m(gen)); }
-
         list_time_sum = 0;
         arr_time_sum = 0;
         for (int i = 0; i < AVG_N; i++) {
@@ -48,7 +41,6 @@ int main() {
             delete arr;
         }
         file << size << ";push_back;" << list_time_sum / AVG_N << ';' << arr_time_sum / AVG_N << std::endl;
-        // std::cout << "push_back done" << std::endl;
 
         list_time_sum = 0;
         arr_time_sum = 0;
@@ -68,7 +60,6 @@ int main() {
             delete arr;
         }
         file << size << ";push_front;" << list_time_sum / AVG_N << ';' << arr_time_sum / AVG_N << std::endl;
-        // std::cout << "push_front done" << std::endl;
 
         list_time_sum = 0;
         arr_time_sum = 0;
@@ -88,7 +79,6 @@ int main() {
             delete arr;
         }
         file << size << ";pop_back;" << list_time_sum / AVG_N << ';' << arr_time_sum / AVG_N << std::endl;
-        // std::cout << "pop_back done" << std::endl;
 
         list_time_sum = 0;
         arr_time_sum = 0;
@@ -108,7 +98,6 @@ int main() {
             delete arr;
         }
         file << size << ";pop_front;" << list_time_sum / AVG_N << ';' << arr_time_sum / AVG_N << std::endl;
-        // std::cout << "pop_front done" << std::endl;
 
         list_time_sum = 0;
         arr_time_sum = 0;
@@ -128,7 +117,6 @@ int main() {
             delete arr;
         }
         file << size << ";insert;" << list_time_sum / AVG_N << ';' << arr_time_sum / AVG_N << std::endl;
-        // std::cout << "insert done" << std::endl;
 
         list_time_sum = 0;
         arr_time_sum = 0;
@@ -148,7 +136,6 @@ int main() {
             delete arr;
         }
         file << size << ";erase;" << list_time_sum / AVG_N << ';' << arr_time_sum / AVG_N << std::endl;
-        // std::cout << "erase done" << std::endl;
 
         list_time_sum = 0;
         arr_time_sum = 0;
@@ -168,7 +155,6 @@ int main() {
             delete arr;
         }
         file << size << ";find;" << list_time_sum / AVG_N << ';' << arr_time_sum / AVG_N << std::endl;
-        // std::cout << "find done" << std::endl;
 
         std::cout << "size " << size << " done" << std::endl;
     }
