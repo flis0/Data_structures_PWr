@@ -2,6 +2,7 @@
 #define LINKED_LIST_HPP
 
 #include <iostream>
+#include <random>
 
 template <typename T>
 class Node {
@@ -24,6 +25,26 @@ class LinkedList {
             head = nullptr;
         }
 
+        LinkedList(int randSize) {
+            head = nullptr;
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<int> dis(0, 999999);
+            for (int i = 0; i < randSize; i++) {
+                push_front(dis(gen));
+            }
+        }
+
+        ~LinkedList() {
+            Node<T>* current = head;
+            Node<T>* nextNode;
+            while (current != nullptr) {
+                nextNode = current->next;
+                delete current;
+                current = nextNode;
+            }
+        }
+
         void push_front(T value) {
             Node<T>* newNode = new Node<T>(value);
             newNode->next = head;
@@ -40,14 +61,13 @@ class LinkedList {
         };
 
         T pop_front() {
-            if (head != nullptr) {
-                Node<T>* temp = head;
-                T value = head->data;
-                head = head->next;
-                delete temp;
-                return value;
-            }
-            return 0; // Not found
+            if (head == nullptr)
+                return 0; // Not found
+            Node<T>* temp = head;
+            T value = head->data;
+            head = head->next;
+            delete temp;
+            return value;
         };
 
         T pop_back() {
@@ -121,7 +141,7 @@ class LinkedList {
             std::cout << std::endl;
         }
 
-        int size() {
+        int get_size() {
             Node<T>* iterator = head;
             int count = 0;
             while (iterator != nullptr) {

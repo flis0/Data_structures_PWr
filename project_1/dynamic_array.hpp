@@ -2,6 +2,7 @@
 #define DYNAMIC_ARRAY_HPP
 
 #include <iostream>
+#include <random>
 
 template <typename T>
 class DynamicArray {
@@ -23,6 +24,18 @@ class DynamicArray {
             capacity = initial_capacity;
             size = 0;
             arr = new T[capacity];
+        }
+
+        DynamicArray(int randSize, int initial_capacity = 10) {
+            capacity = initial_capacity;
+            size = 0;
+            arr = new T[capacity];
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<int> dis(0, 999999);
+            for (int i = 0; i < randSize; i++) {
+                push_back(dis(gen));
+            }
         }
 
         ~DynamicArray() {
