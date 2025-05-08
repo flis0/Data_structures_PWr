@@ -1,38 +1,9 @@
-#ifndef ELEMENT_STRUCT
-#define ELEMENT_STRUCT
-template <typename T, typename P>
-struct element {
-    T value;
-    P priority;
-
-    operator T() const {
-        return value;
-    }
-
-    bool operator<(const element& other) const {
-        return priority < other.priority;
-    }
-
-    bool operator<=(const element& other) const {
-        return priority <= other.priority;
-    }
-
-    bool operator==(const element& other) const {
-        return value == other.value;
-    }
-};
-#endif
-
 #ifndef LINKED_LIST_HPP
 #define LINKED_LIST_HPP
 
 #include <iostream>
 #include <random>
-
-template <typename T, typename P>
-std::ostream& operator<<(std::ostream& os, const element<T, P>& e) {
-    return os << e.value << "(" << e.priority << ")";
-}
+#include "priority_queue.hpp"
 
 template <typename T, typename P>
 class Node {
@@ -44,15 +15,15 @@ class Node {
 };
 
 template <typename T, typename P>
-class LinkedList_PriorityQueue {
+class LinkedList : public PriorityQueue<T, P> {
     private:
         Node<T, P>* head;
     public:
-        LinkedList_PriorityQueue() {
+        LinkedList() {
             head = nullptr;
         }
 
-        LinkedList_PriorityQueue(int randSize) {
+        LinkedList(int randSize) {
             head = nullptr;
             std::random_device rd;
             std::mt19937 gen(rd());
@@ -63,7 +34,7 @@ class LinkedList_PriorityQueue {
             }
         }
 
-        ~LinkedList_PriorityQueue() {
+        ~LinkedList() {
             Node<T, P>* current = head;
             Node<T, P>* nextNode;
             while (current != nullptr) {
@@ -105,7 +76,7 @@ class LinkedList_PriorityQueue {
             return head->data;
         };
 
-        int get_size() {
+        size_t size() {
             Node<T, P>* iterator = head;
             int count = 0;
             while (iterator != nullptr) {
