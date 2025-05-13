@@ -2,19 +2,25 @@
 #include <chrono>
 #include <random>
 #include <fstream>
-#include "linked_list_pq.hpp"
-#include "dynamic_array_pq.hpp"
 #include "priority_queue.hpp"
+#include "linked_list_pq.hpp"
+#include "linked_list_2_pq.hpp"
+#include "dynamic_array_pq.hpp"
 
 
 #define AVG_N 100
 #define ARR_INIT_CAP 10
 
-int main() {
-    // structure_tests();
+template <size_t N>
+inline void zeros(long (&arr)[N]) { for (size_t i = 0; i < N; ++i) arr[i] = 0; }
 
-    long list_time_sum, arr_time_sum;
-    int temp;
+void structure_tests();
+
+int main() {
+    // structure_tests(); return 0;
+
+    long time_sums[] = {0, 0, 0};
+    PriorityQueue<int, int>* structures[3];
     std::chrono::high_resolution_clock::time_point start, end;
 
     std::random_device rd;
@@ -24,95 +30,146 @@ int main() {
 
     std::ofstream file;
     file.open("output.csv", std::ios::out | std::ios::trunc);
-    file << "N;Operation;LinkedList_PriorityQueue [ns];DynamicArray_PriorityQueue [ns]" << std::endl;
+    file << "N;Operation;Case;LinkedList [ns];DynamicArray [ns];LinkedList2 [ns]" << std::endl;
 
     for (int size = 10000; size <= 100000; size += 10000) {
-        PriorityQueue<int, int> * list = new LinkedList<int, int>(size);
-        PriorityQueue<int, int> * arr = new DynamicArray<int, int>(size, ARR_INIT_CAP);
+        structures[0] = new LinkedList<int, int>(size);
+        structures[1] = new DynamicArray<int, int>(size, ARR_INIT_CAP);
+        structures[2] = new LinkedList2<int, int>(size);
+        zeros(time_sums);
 
-        list_time_sum = 0;
-        arr_time_sum = 0;
-        for (int i = 0; i < AVG_N; i++) {
-            start = std::chrono::high_resolution_clock::now();
-            list->push({dis_1m(gen), dis_1k(gen)});
-            end = std::chrono::high_resolution_clock::now();
-            list_time_sum += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-            list->pop();
+        // ########## AVG ##########
 
-            start = std::chrono::high_resolution_clock::now();
-            arr->push({dis_1m(gen), dis_1k(gen)});
-            end = std::chrono::high_resolution_clock::now();
-            arr_time_sum += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-            arr->pop();
+        for (int i = 0; i < sizeof(structures) / sizeof(structures[0]); i++) {
+            for (int j = 0; j < AVG_N; j++) {
+                start = std::chrono::high_resolution_clock::now();
+                structures[i]->push({dis_1m(gen), dis_1k(gen)});
+                end = std::chrono::high_resolution_clock::now();
+                time_sums[i] += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+                structures[i]->pop();
+            }
         }
-        file << size << ";push;" << list_time_sum / AVG_N << ';' << arr_time_sum / AVG_N << std::endl;
+        file << size << ";push;avg;" << time_sums[0] / AVG_N << ';' << time_sums[1] / AVG_N << ';' << time_sums[2] / AVG_N << std::endl;
+        zeros(time_sums);
 
-        list_time_sum = 0;
-        arr_time_sum = 0;
-        for (int i = 0; i < AVG_N; i++) {
-            start = std::chrono::high_resolution_clock::now();
-            list->pop();
-            end = std::chrono::high_resolution_clock::now();
-            list_time_sum += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-            list->push({dis_1m(gen), dis_1k(gen)});
-
-            start = std::chrono::high_resolution_clock::now();
-            arr->pop();
-            end = std::chrono::high_resolution_clock::now();
-            arr_time_sum += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-            arr->push({dis_1m(gen), dis_1k(gen)});
+        for (int i = 0; i < sizeof(structures) / sizeof(structures[0]); i++) {
+            for (int j = 0; j < AVG_N; j++) {
+                start = std::chrono::high_resolution_clock::now();
+                structures[i]->pop();
+                end = std::chrono::high_resolution_clock::now();
+                time_sums[i] += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+                structures[i]->push({dis_1m(gen), dis_1k(gen)});
+            }
         }
-        file << size << ";pop;" << list_time_sum / AVG_N << ';' << arr_time_sum / AVG_N << std::endl;
+        file << size << ";pop;avg;" << time_sums[0] / AVG_N << ';' << time_sums[1] / AVG_N << ';' << time_sums[2] / AVG_N << std::endl;
+        zeros(time_sums);
 
-        list_time_sum = 0;
-        arr_time_sum = 0;
-        for (int i = 0; i < AVG_N; i++) {
-            start = std::chrono::high_resolution_clock::now();
-            list->peek();
-            end = std::chrono::high_resolution_clock::now();
-            list_time_sum += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-
-            start = std::chrono::high_resolution_clock::now();
-            arr->peek();
-            end = std::chrono::high_resolution_clock::now();
-            arr_time_sum += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        for (int i = 0; i < sizeof(structures) / sizeof(structures[0]); i++) {
+            for (int j = 0; j < AVG_N; j++) {
+                start = std::chrono::high_resolution_clock::now();
+                structures[i]->peek();
+                end = std::chrono::high_resolution_clock::now();
+                time_sums[i] += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+            }
         }
-        file << size << ";peek;" << list_time_sum / AVG_N << ';' << arr_time_sum / AVG_N << std::endl;
+        file << size << ";peek;avg;" << time_sums[0] / AVG_N << ';' << time_sums[1] / AVG_N << ';' << time_sums[2] / AVG_N << std::endl;
+        zeros(time_sums);
 
-        list_time_sum = 0;
-        arr_time_sum = 0;
-        for (int i = 0; i < AVG_N; i++) {
-            start = std::chrono::high_resolution_clock::now();
-            list->size();
-            end = std::chrono::high_resolution_clock::now();
-            list_time_sum += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-
-            start = std::chrono::high_resolution_clock::now();
-            arr->size();
-            end = std::chrono::high_resolution_clock::now();
-            arr_time_sum += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        for (int i = 0; i < sizeof(structures) / sizeof(structures[0]); i++) {
+            for (int j = 0; j < AVG_N; j++) {
+                start = std::chrono::high_resolution_clock::now();
+                structures[i]->size();
+                end = std::chrono::high_resolution_clock::now();
+                time_sums[i] += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+            }
         }
-        file << size << ";size;" << list_time_sum / AVG_N << ';' << arr_time_sum / AVG_N << std::endl;
+        file << size << ";size;avg;" << time_sums[0] / AVG_N << ';' << time_sums[1] / AVG_N << ';' << time_sums[2] / AVG_N << std::endl;
+        zeros(time_sums);
 
-        list_time_sum = 0;
-        arr_time_sum = 0;
-        for (int i = 0; i < AVG_N; i++) {
-            start = std::chrono::high_resolution_clock::now();
-            list->modify(dis_1m(gen), dis_1k(gen));
-            end = std::chrono::high_resolution_clock::now();
-            list_time_sum += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-
-            start = std::chrono::high_resolution_clock::now();
-            arr->modify(dis_1m(gen), dis_1k(gen));
-            end = std::chrono::high_resolution_clock::now();
-            arr_time_sum += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        for (int i = 0; i < sizeof(structures) / sizeof(structures[0]); i++) {
+            for (int j = 0; j < AVG_N; j++) {
+                start = std::chrono::high_resolution_clock::now();
+                structures[i]->modify(dis_1m(gen), dis_1k(gen));
+                end = std::chrono::high_resolution_clock::now();
+                time_sums[i] += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+            }
         }
-        file << size << ";modify;" << list_time_sum / AVG_N << ';' << arr_time_sum / AVG_N << std::endl;
+        file << size << ";modify;avg;" << time_sums[0] / AVG_N << ';' << time_sums[1] / AVG_N << ';' << time_sums[2] / AVG_N << std::endl;
+        zeros(time_sums);
 
-        delete list;
-        delete arr;
+        // ########## BEST ##########
 
-        std::cout << "size " << size << " done" << std::endl;
+        for (auto i : {0,2}) { // LinkedList and LinkedList2
+            for (int j = 0; j < AVG_N; j++) {
+                start = std::chrono::high_resolution_clock::now();
+                structures[i]->push({dis_1m(gen), 999});
+                end = std::chrono::high_resolution_clock::now();
+                time_sums[i] += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+            }
+        }
+        for (int j = 0; j < AVG_N; j++) { // DynamicArray
+            start = std::chrono::high_resolution_clock::now();
+            structures[1]->push({dis_1m(gen), 0});
+            end = std::chrono::high_resolution_clock::now();
+            time_sums[1] += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        }
+        file << size << ";push;best;" << time_sums[0] / AVG_N << ';' << time_sums[1] / AVG_N << ';' << time_sums[2] / AVG_N << std::endl;
+        zeros(time_sums);
+
+        for (auto i : {0,2}) { // LinkedList and LinkedList2
+            for (int j = 0; j < AVG_N; j++) {
+                start = std::chrono::high_resolution_clock::now();
+                structures[i]->modify(dis_1k(gen), 999, structures[i]->find_p(999));
+                end = std::chrono::high_resolution_clock::now();
+                time_sums[i] += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+            }
+        }
+        for (int j = 0; j < AVG_N; j++) { // DynamicArray
+            start = std::chrono::high_resolution_clock::now();
+            structures[1]->modify(dis_1k(gen), 0, structures[1]->find_p(0));
+            end = std::chrono::high_resolution_clock::now();
+            time_sums[1] += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        }
+        file << size << ";modify;best;" << time_sums[0] / AVG_N << ';' << time_sums[1] / AVG_N << ';' << time_sums[2] / AVG_N << std::endl;
+        zeros(time_sums);
+
+        // ########## WORST ##########
+
+        for (auto i : {0,2}) { // LinkedList and LinkedList2
+            for (int j = 0; j < AVG_N; j++) {
+                start = std::chrono::high_resolution_clock::now();
+                structures[i]->push({dis_1m(gen), 0});
+                end = std::chrono::high_resolution_clock::now();
+                time_sums[i] += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+            }
+        }
+        for (int j = 0; j < AVG_N; j++) { // DynamicArray
+            start = std::chrono::high_resolution_clock::now();
+            structures[1]->push({dis_1m(gen), 999});
+            end = std::chrono::high_resolution_clock::now();
+            time_sums[1] += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        }
+        file << size << ";push;worst;" << time_sums[0] / AVG_N << ';' << time_sums[1] / AVG_N << ';' << time_sums[2] / AVG_N << std::endl;
+        zeros(time_sums);
+
+        for (auto i : {0,2}) { // LinkedList and LinkedList2
+            for (int j = 0; j < AVG_N; j++) {
+                start = std::chrono::high_resolution_clock::now();
+                structures[i]->modify(dis_1k(gen), 0, structures[i]->find_p(0));
+                end = std::chrono::high_resolution_clock::now();
+                time_sums[i] += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+            }
+        }
+        for (int j = 0; j < AVG_N; j++) { // DynamicArray
+            start = std::chrono::high_resolution_clock::now();
+            structures[1]->modify(dis_1k(gen), 999, structures[1]->find_p(999));
+            end = std::chrono::high_resolution_clock::now();
+            time_sums[1] += std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+        }
+        file << size << ";modify;worst;" << time_sums[0] / AVG_N << ';' << time_sums[1] / AVG_N << ';' << time_sums[2] / AVG_N << std::endl;
+        zeros(time_sums);
+
+        std::cout << size << " done" << std::endl;
     }
 }
 
@@ -162,5 +219,26 @@ void structure_tests() {
     arr->modify(4, 2);
     std::cout << "Modify 4 to 2" << std::endl;
     arr->print();
-}
 
+    PriorityQueue<int, int> * list2 = new LinkedList2<int, int>();
+    std::cout << std::endl << "Linked List2 Priority Queue" << std::endl;
+    std::cout << "-------------------------" << std::endl;
+    list2->push({6, 1});
+    list2->push({5, 2});
+    list2->push({4, 3});
+    list2->push({3, 3});
+    list2->push({2, 4});
+    list2->push({1, 5});
+
+    list2->print();
+
+    std::cout << "Size: " << list2->size() << std::endl;
+    std::cout << "Peek: " << list2->peek() << std::endl;
+    std::cout << "Pop: " << list2->pop() << std::endl;
+    list2->print();
+    std::cout << "Size: " << list2->size() << std::endl;
+    std::cout << "Peek: " << list2->peek() << std::endl;
+    list2->modify(4, 2);
+    std::cout << "Modify 4 to 2" << std::endl;
+    list2->print();
+}
