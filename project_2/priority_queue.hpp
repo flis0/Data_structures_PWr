@@ -37,8 +37,9 @@ public:
     virtual T pop() = 0;
     virtual T peek() = 0;
     virtual size_t size() = 0;
-    virtual void modify(T value, P new_priority) = 0;
+    virtual void modify(T value, P new_priority, size_t index = -1) = 0;
     virtual void print() = 0;
+    virtual size_t find_p(P priority) = 0;
 };
 
 #endif

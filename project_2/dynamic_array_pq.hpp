@@ -10,7 +10,7 @@ class DynamicArray : public PriorityQueue<T, P> {
         element<T, P>* arr;
         int capacity;
         size_t arr_size;
-        void uparr_size() {
+        void up_arr_size() {
             capacity *= 2;
             element<T, P>* new_arr = new element<T, P>[capacity];
             for (int i = 0; i < arr_size; i++) {
@@ -45,7 +45,7 @@ class DynamicArray : public PriorityQueue<T, P> {
         }
 
         void push(element<T, P> value) {
-            if (arr_size == capacity) uparr_size();
+            if (arr_size == capacity) up_arr_size();
 
             int i = arr_size - 1;
             while (i >= 0 && arr[i] < value) {
@@ -76,10 +76,11 @@ class DynamicArray : public PriorityQueue<T, P> {
             return arr_size;
         }
 
-        void modify(T value, P new_priority) {
+        void modify(T value, P new_priority, size_t index = -1) {
             // finds first array element with value, removes it and pushes it back with new priority
             // if not found does nothing
-            int index = find(value);
+            if (index == -1)
+                index = find(value);
             if (index == -1) return;
             push({erase(index), new_priority});
         }
@@ -89,6 +90,15 @@ class DynamicArray : public PriorityQueue<T, P> {
                 std::cout << arr[i] << " ";
             }
             std::cout << std::endl;
+        }
+
+        size_t find_p(P priority) {
+            for (int i = 0; i < arr_size; i++) {
+                if (arr[i].priority == priority) {
+                    return i;
+                }
+            }
+            return -1; // Not found
         }
 
 

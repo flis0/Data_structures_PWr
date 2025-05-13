@@ -1,30 +1,32 @@
-#ifndef LINKED_LIST_HPP
-#define LINKED_LIST_HPP
+#ifndef LINKED_LIST2_HPP
+#define LINKED_LIST2_HPP
 
 #include <iostream>
 #include <random>
 #include "priority_queue.hpp"
 
 template <typename T, typename P>
-class Node {
+class Node2 {
     public:
         element<T, P> data;
-        Node* next;
+        Node2 *next, *prev;
 
-        Node(element<T, P> elem) : data(elem), next(nullptr) {}
+        Node2(element<T, P> elem) : data(elem), next(nullptr) {}
 };
 
 template <typename T, typename P>
-class LinkedList : public PriorityQueue<T, P> {
+class LinkedList2 : public PriorityQueue<T, P> {
     private:
-        Node<T, P>* head;
+        Node2<T, P> *head, *tail;
     public:
-        LinkedList() {
+        LinkedList2() {
             head = nullptr;
+            tail = nullptr;
         }
 
-        LinkedList(int randSize) {
+        LinkedList2(int randSize) {
             head = nullptr;
+            tail = nullptr;
             std::random_device rd;
             std::mt19937 gen(rd());
             std::uniform_int_distribution<int> dis_1m(0, 999999);
@@ -34,9 +36,9 @@ class LinkedList : public PriorityQueue<T, P> {
             }
         }
 
-        ~LinkedList() {
-            Node<T, P>* current = head;
-            Node<T, P>* nextNode;
+        ~LinkedList2() {
+            Node2<T, P>* current = head;
+            Node2<T, P>* nextNode;
             while (current != nullptr) {
                 nextNode = current->next;
                 delete current;
@@ -46,24 +48,31 @@ class LinkedList : public PriorityQueue<T, P> {
 
         void push(element<T, P> e) {
             // insert in sorted order based on priority
-            Node<T, P>* newNode = new Node<T, P>(e);
+            Node2<T, P>* newNode = new Node2<T, P>(e);
             if (head == nullptr || head->data < e) {
                 newNode->next = head;
                 head = newNode;
+                tail = newNode;
             } else {
-                Node<T, P>* current = head;
+                Node2<T, P>* current = head;
                 while (current->next != nullptr && e <= current->next->data) {
                     current = current->next;
                 }
                 newNode->next = current->next;
+                newNode->prev = current;
                 current->next = newNode;
+                if (newNode->next != nullptr) {
+                    newNode->next->prev = newNode;
+                } else {
+                    tail = newNode;
+                }
             }
         };
 
         T pop() {
             if (head == nullptr)
                 return 0;
-            Node<T, P>* temp = head;
+            Node2<T, P>* temp = head;
             T value = head->data;
             head = head->next;
             delete temp;
@@ -77,7 +86,7 @@ class LinkedList : public PriorityQueue<T, P> {
         };
 
         size_t size() {
-            Node<T, P>* iterator = head;
+            Node2<T, P>* iterator = head;
             int count = 0;
             while (iterator != nullptr) {
                 count++;
@@ -86,8 +95,8 @@ class LinkedList : public PriorityQueue<T, P> {
             return count;
         }
 
-        void modify(T value, P new_priority, size_t index = -1) {
-            // finds first node with value, removes it and pushes it back with new priority (if the index wasn't given)
+        void modify(T value, P new_priority, size_t index=-1) {
+            // finds first node with value, removes it and pushes it back with new priority
             // if not found does nothing
             if (index == -1)
                 index = find(value);
@@ -96,7 +105,7 @@ class LinkedList : public PriorityQueue<T, P> {
         };
 
         void print() {
-            Node<T, P>* iterator = head;
+            Node2<T, P>* iterator = head;
             while (iterator != nullptr) {
                 std::cout << iterator->data << " ";
                 iterator = iterator->next;
@@ -105,7 +114,7 @@ class LinkedList : public PriorityQueue<T, P> {
         }
 
         size_t find_p(P priority) {
-            Node<T, P>* iterator = head;
+            Node2<T, P>* iterator = head;
             int index = 0;
             while (iterator != nullptr) {
                 if (iterator->data.priority == priority) {
@@ -122,12 +131,12 @@ class LinkedList : public PriorityQueue<T, P> {
         T erase(int index) {
             if (index == 0) return pop();
 
-            Node<T, P>** iterator = &head;
+            Node2<T, P>** iterator = &head;
             for (int i = 0; i < index - 1 && *iterator != nullptr; i++) {
                 iterator = &((*iterator)->next);
             }
             if (*iterator != nullptr && (*iterator)->next != nullptr) {
-                Node<T, P>* temp = (*iterator)->next;
+                Node2<T, P>* temp = (*iterator)->next;
                 (*iterator)->next = temp->next;
                 element<T, P> elem = temp->data;
                 delete temp;
@@ -138,7 +147,7 @@ class LinkedList : public PriorityQueue<T, P> {
         };
 
         int find(T value) {
-            Node<T, P>* iterator = head;
+            Node2<T, P>* iterator = head;
             int index = 0;
             while (iterator != nullptr) {
                 if (iterator->data == value) {
